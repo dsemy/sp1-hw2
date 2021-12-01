@@ -125,13 +125,26 @@ void shortest_route(int dist_matrix[MAT_SIZE][MAT_SIZE])
      int i, j;
      scanf("%d%d", &i, &j);
 
+     /* Almost exact copy of the Floyd-Warshall algorithm; only
+      * difference being two special cases which arise from treating
+      * the distance -1 as infinity. */
      for (size_t n = 0; n < MAT_SIZE; n++) {
           for (size_t m = 0; m < MAT_SIZE; m++) {
                for (size_t l = 0; l < MAT_SIZE; l++) {
                     int dist_sum = dist_matrix[m][n] + dist_matrix[n][l];
-                    
+
+                    /* Special case, no (m, l) edge. */
                     if (dist_matrix[m][l] == -1) {
-                         continue;
+                         if (dist_matrix[m][n] == -1
+                             || dist_matrix[n][l] == -1) {
+                              continue;
+                         } else { /* If the other edges exits, their
+                                   * sum must be smaller. */
+                              dist_matrix[m][l] = dist_sum;
+                         }
+                         /* Special case, (m, l) is an edge but one of
+                          * (m, n), (n, l) aren't. In this case, just
+                          * keep the original value. */
                     } else if (dist_matrix[m][n] == -1
                                || dist_matrix[n][l] == -1) {
                          continue;
@@ -142,5 +155,6 @@ void shortest_route(int dist_matrix[MAT_SIZE][MAT_SIZE])
           }
      }
 
+     /* Print the distance calculated for (i, j). */
      printf("%d\n", dist_matrix[i][j]);
 }
